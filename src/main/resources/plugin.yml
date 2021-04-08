@@ -1,0 +1,15 @@
+name: SkillArmorSets
+version: ${project.version}
+main: uk.co.tmdavies.skillarmorsets.SkillArmorSets
+authors: [Carbonate]
+api-version: 1.14
+description: Skill Armor Sets
+website: https://www.tmdavies.co.uk
+commands:
+  set:
+  test:
+permissions:
+  armorskillsets.set:
+    default: op
+  armorskillsets.set.mobcoin:
+    default: op
