@@ -39,7 +39,7 @@ public class MobCoinLeggings {
 
         lore.add("");
         lore.add(Utils.Chat("&7Level: &b" + lMeta.getPersistentDataContainer().get(levelKey, PersistentDataType.INTEGER)));
-        lore.add(Utils.Chat("&7XP: &b" + lMeta.getPersistentDataContainer().get(levelKey, PersistentDataType.INTEGER)) + "/" + levelReq);
+        lore.add(Utils.Chat("&7XP: &b" + lMeta.getPersistentDataContainer().get(xpKey, PersistentDataType.INTEGER)) + "/" + levelReq);
         lore.add(ItemUtils.getProgressBar(0, levelReq, getXp()));
         lore.add("");
         lore.add(Utils.Chat("&bFULL SET ABILITY"));

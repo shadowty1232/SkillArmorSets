@@ -39,7 +39,7 @@ public class MobCoinChestplate {
 
         lore.add("");
         lore.add(Utils.Chat("&7Level: &b" + cMeta.getPersistentDataContainer().get(levelKey, PersistentDataType.INTEGER)));
-        lore.add(Utils.Chat("&7XP: &b" + cMeta.getPersistentDataContainer().get(levelKey, PersistentDataType.INTEGER)) + "/" + levelReq);
+        lore.add(Utils.Chat("&7XP: &b" + cMeta.getPersistentDataContainer().get(xpKey, PersistentDataType.INTEGER)) + "/" + levelReq);
         lore.add(ItemUtils.getProgressBar(0, levelReq, getXp()));
         lore.add("");
         lore.add(Utils.Chat("&bFULL SET ABILITY"));

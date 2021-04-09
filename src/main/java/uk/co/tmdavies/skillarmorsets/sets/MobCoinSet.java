@@ -1,6 +1,5 @@
 package uk.co.tmdavies.skillarmorsets.sets;
 
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +20,12 @@ public class MobCoinSet {
     private MobCoinLeggings leggings;
     private MobCoinBoots boots;
     private MobCoinSword sword;
-    private NamespacedKey mobcoinKey = new NamespacedKey(JavaPlugin.getPlugin(SkillArmorSets.class), "mobcoinset");
+    private SkillArmorSets plugin = JavaPlugin.getPlugin(SkillArmorSets.class);
+    private NamespacedKey mobcoinKey = new NamespacedKey(plugin, "mobcoinset");
+    private NamespacedKey swordKey = new NamespacedKey(plugin, "sword");
+    private Config data = plugin.data;
+    private boolean setEnabled = false;
+
 
     public MobCoinSet(Player player) {
         this.player = player;
@@ -98,6 +102,10 @@ public class MobCoinSet {
     }
 
     public void giveSet() {
+        if (setEnabled) {
+            player.sendMessage(Utils.Chat("&cYou've already equipped your set."));
+            return;
+        }
         int emptySpaces = 0;
         for (ItemStack item : player.getInventory()) {
             if (item == null) emptySpaces++;
@@ -111,13 +119,46 @@ public class MobCoinSet {
         player.getInventory().addItem(leggings.getLeggings());
         player.getInventory().addItem(boots.getBoots());
         player.getInventory().addItem(sword.getSword());
+        setEnabled = true;
     }
 
     public void removeSet() {
+        if (!setEnabled) {
+            player.sendMessage(Utils.Chat("&cYou do not have a set equipped."));
+        }
+        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.DisplayName", getHelmet().getItemMeta().getDisplayName());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.DisplayName", getChestplate().getItemMeta().getDisplayName());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.DisplayName", getLeggings().getItemMeta().getDisplayName());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.DisplayName", getBoots().getItemMeta().getDisplayName());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.DisplayName", getSword().getItemMeta().getDisplayName());
+
+        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.Lore", getHelmet().getLore());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.Lore", getChestplate().getLore());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.Lore", getLeggings().getLore());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.Lore", getBoots().getLore());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.Lore", getSword().getLore());
+
+        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.Level", getHelmet().getLevel());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.Level", getChestplate().getLevel());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.Level", getLeggings().getLevel());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.Level", getBoots().getLevel());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.Level", getSword().getLevel());
+
+        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.XP", getHelmet().getXp());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.XP", getChestplate().getXp());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.XP", getLeggings().getXp());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.XP", getBoots().getXp());
+        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.XP", getSword().getXp());
+
+        data.reloadConfig();
+
         if (player.getInventory().getSize() == 0) return;
         for (ItemStack item : player.getInventory()) {
             if (item == null) continue;
             if (item.getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+                player.getInventory().remove(item);
+            }
+            if (item.getItemMeta().getPersistentDataContainer().has(swordKey, PersistentDataType.STRING)) {
                 player.getInventory().remove(item);
             }
         }
@@ -127,6 +168,7 @@ public class MobCoinSet {
                 player.getInventory().remove(item);
             }
         }
+        setEnabled = false;
     }
 
 }

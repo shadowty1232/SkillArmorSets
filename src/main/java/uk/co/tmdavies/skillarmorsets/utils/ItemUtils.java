@@ -39,11 +39,14 @@ public class ItemUtils {
         lore.set(2, Utils.Chat("&7XP: &b" + container.get(xpKey, PersistentDataType.INTEGER) + "/" + container.get(levelKey, PersistentDataType.INTEGER) * 100));
         lore.set(3, getProgressBar(0, levelReq, container.get(xpKey, PersistentDataType.INTEGER)));
 
+        iMeta.setLore(lore);
+
         item.setItemMeta(iMeta);
 
         return item;
     }
 
+    @Deprecated
     public static ItemStack gainXP(ItemStack item) {
         ItemMeta hMeta = item.getItemMeta();
         PersistentDataContainer container = hMeta.getPersistentDataContainer();
