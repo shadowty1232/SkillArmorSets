@@ -7,10 +7,14 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import uk.co.tmdavies.skillarmorsets.SkillArmorSets;
 import uk.co.tmdavies.skillarmorsets.sets.mobcoinset.*;
+import uk.co.tmdavies.skillarmorsets.sql.MySQL;
 import uk.co.tmdavies.skillarmorsets.utils.Config;
 import uk.co.tmdavies.skillarmorsets.utils.Utils;
 
-import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class MobCoinSet {
 
@@ -24,6 +28,7 @@ public class MobCoinSet {
     private NamespacedKey mobcoinKey = new NamespacedKey(plugin, "mobcoinset");
     private NamespacedKey swordKey = new NamespacedKey(plugin, "sword");
     private Config data = plugin.data;
+    private MySQL sql = plugin.sql;
     private boolean setEnabled = false;
 
 
@@ -34,10 +39,13 @@ public class MobCoinSet {
         leggings = new MobCoinLeggings();
         boots = new MobCoinBoots();
         sword = new MobCoinSword();
+
+        giveSet();
+
+        player.sendMessage(Utils.Chat("&aYou have been giving set MobCoin."));
     }
 
     public MobCoinSet(Player player, boolean hasJoined) {
-        Config data = JavaPlugin.getPlugin(SkillArmorSets.class).data;
 
         if (!hasJoined) {
             new MobCoinSet(player);
@@ -46,35 +54,26 @@ public class MobCoinSet {
 
         this.player = player;
 
-        String helmetName = data.getString("MobCoinSet." + player.getUniqueId().toString() + ".Helmet.DisplayName");
-        String chestplateName = data.getString("MobCoinSet." + player.getUniqueId().toString() + ".Chestplate.DisplayName");
-        String leggingsName = data.getString("MobCoinSet." + player.getUniqueId().toString() + ".Leggings.DisplayName");
-        String bootsName = data.getString("MobCoinSet." + player.getUniqueId().toString() + ".Boots.DisplayName");
-        String swordName = data.getString("MobCoinSet." + player.getUniqueId().toString() + ".Sword.DisplayName");
+        int swordLevel;
+        int swordXp;
 
-        List<String> helmetLore = data.getStringList("MobCoinSet." + player.getUniqueId().toString() + ".Helmet.Lore");
-        List<String> chestplateLore = data.getStringList("MobCoinSet." + player.getUniqueId().toString() + ".Chestplate.Lore");
-        List<String> leggingsLore = data.getStringList("MobCoinSet." + player.getUniqueId().toString() + ".Leggings.Lore");
-        List<String> bootsLore = data.getStringList("MobCoinSet." + player.getUniqueId().toString() + ".Boots.Lore");
-        List<String> swordLore = data.getStringList("MobCoinSet." + player.getUniqueId().toString() + ".Sword.Lore");
+        String query = "SELECT * FROM '" + sql.getDatabase() + "'.`MobCoinSword` WHERE `UUID` = ?";
+        try (PreparedStatement grabState = sql.getConnection().prepareStatement(query)) {
+            ResultSet set = grabState.executeQuery(query);
+            swordLevel = set.getInt(2);
+            swordXp = set.getInt(3);
+        } catch (SQLException e) {
+            plugin.getLogger().info(Level.SEVERE + " Sword Info Grab Failure");
+            player.sendMessage(Utils.Chat("&c" + Level.SEVERE + " Sword Info Grab Failure"));
+            return;
+        }
 
-        int helmetLevel = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Helmet.Level");
-        int chestplateLevel = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Chestplate.Level");
-        int leggingsLevel = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Leggings.Level");
-        int bootsLevel = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Boots.Level");
-        int swordLevel = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Sword.Level");
+        helmet = new MobCoinHelmet();
+        chestplate = new MobCoinChestplate();
+        leggings = new MobCoinLeggings();
+        boots = new MobCoinBoots();
+        sword = new MobCoinSword(swordLevel, swordXp);
 
-        int helmetXp = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Helmet.XP");
-        int chestplateXp = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Chestplate.XP");
-        int leggingsXp = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Leggings.XP");
-        int bootsXp = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Boots.XP");
-        int swordXp = data.getInt("MobCoinSet." + player.getUniqueId().toString() + ".Sword.XP");
-
-        helmet = new MobCoinHelmet(helmetName, helmetLore, helmetLevel, helmetXp);
-        chestplate = new MobCoinChestplate(chestplateName, chestplateLore, chestplateLevel, chestplateXp);
-        leggings = new MobCoinLeggings(leggingsName, leggingsLore, leggingsLevel, leggingsXp);
-        boots = new MobCoinBoots(bootsName, bootsLore, bootsLevel, bootsXp);
-        sword = new MobCoinSword(swordName, swordLore, swordLevel, swordXp);
     }
 
     public Player getPlayer() {
@@ -138,16 +137,7 @@ public class MobCoinSet {
         data.set("MobCoinSet." + player.getUniqueId() + ".Boots.Lore", getBoots().getLore());
         data.set("MobCoinSet." + player.getUniqueId() + ".Sword.Lore", getSword().getLore());
 
-        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.Level", getHelmet().getLevel());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.Level", getChestplate().getLevel());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.Level", getLeggings().getLevel());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.Level", getBoots().getLevel());
         data.set("MobCoinSet." + player.getUniqueId() + ".Sword.Level", getSword().getLevel());
-
-        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.XP", getHelmet().getXp());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.XP", getChestplate().getXp());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.XP", getLeggings().getXp());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.XP", getBoots().getXp());
         data.set("MobCoinSet." + player.getUniqueId() + ".Sword.XP", getSword().getXp());
 
         data.reloadConfig();

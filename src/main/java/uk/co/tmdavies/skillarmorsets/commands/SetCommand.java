@@ -35,8 +35,7 @@ public class SetCommand implements CommandExecutor {
                 case "give":
                     if (args[1].equalsIgnoreCase("mobcoin")) {
                         if (p.hasPermission("skillarmorsets.set.mobcoin")) {
-                            MobCoinSet mobCoinSet = new MobCoinSet(p);
-                            mobCoinSet.giveSet();
+                            plugin.mcSetStorage.get(p).giveSet();
                             p.sendMessage(Utils.Chat("&aYou have been giving set MobCoin."));
                         }
                     }
@@ -44,7 +43,7 @@ public class SetCommand implements CommandExecutor {
                 case "remove":
                     if (args[1].equalsIgnoreCase("mobcoin")) {
                         if (p.hasPermission("skillarmorsets.set.mobcoin")) {
-                            MobCoinSet mobCoinSet = new MobCoinSet(p);
+                            MobCoinSet mobCoinSet = plugin.mcSetStorage.get(p);
                             mobCoinSet.removeSet();
                             p.sendMessage(Utils.Chat("&cYou have taken away set MobCoin."));
                         }

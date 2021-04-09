@@ -15,6 +15,8 @@ import uk.co.tmdavies.skillarmorsets.sets.MobCoinSet;
 import uk.co.tmdavies.skillarmorsets.sets.mobcoinset.MobCoinSword;
 import uk.co.tmdavies.skillarmorsets.utils.Config;
 
+import java.sql.SQLException;
+
 public class PlayerListener implements Listener {
 
     private final SkillArmorSets plugin;
@@ -33,6 +35,7 @@ public class PlayerListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         if (data.getString("MobCoinSet." + e.getPlayer().getUniqueId().toString()) == null) {
             MobCoinSet set = new MobCoinSet(e.getPlayer());
+            set.getSword().fillSwordTable(e.getPlayer());
 
             plugin.mcSetStorage.put(e.getPlayer(), set);
         } else {
@@ -44,9 +47,10 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onLeave(PlayerQuitEvent e) {
+    public void onLeave(PlayerQuitEvent e) throws SQLException {
         Player p = e.getPlayer();
         MobCoinSet set = plugin.mcSetStorage.get(p);
+        set.getSword().saveSQL(p);
 
         set.removeSet();
     }
