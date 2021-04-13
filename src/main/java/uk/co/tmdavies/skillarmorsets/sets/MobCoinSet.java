@@ -27,7 +27,6 @@ public class MobCoinSet {
     private SkillArmorSets plugin = JavaPlugin.getPlugin(SkillArmorSets.class);
     private NamespacedKey mobcoinKey = new NamespacedKey(plugin, "mobcoinset");
     private NamespacedKey swordKey = new NamespacedKey(plugin, "sword");
-    private Config data = plugin.data;
     private MySQL sql = plugin.sql;
     private boolean setEnabled = false;
 
@@ -53,18 +52,21 @@ public class MobCoinSet {
         }
 
         this.player = player;
-
         int swordLevel;
         int swordXp;
 
-        String query = "SELECT * FROM '" + sql.getDatabase() + "'.`MobCoinSword` WHERE `UUID` = ?";
-        try (PreparedStatement grabState = sql.getConnection().prepareStatement(query)) {
-            ResultSet set = grabState.executeQuery(query);
-            swordLevel = set.getInt(2);
-            swordXp = set.getInt(3);
+        String query = "SELECT * FROM `" + sql.getDatabase() + "`.`MobCoinSword` WHERE `UUID` = ?";
+        try {
+            PreparedStatement grabState = sql.getConnection().prepareStatement(query);
+            grabState.setString(1, player.getUniqueId().toString());
+            ResultSet set = grabState.executeQuery();
+            plugin.getLogger().info(String.valueOf(MySQL.rowCount(set)));
+            swordLevel = set.getInt("LEVEL");
+            swordXp = set.getInt("XP");
         } catch (SQLException e) {
             plugin.getLogger().info(Level.SEVERE + " Sword Info Grab Failure");
             player.sendMessage(Utils.Chat("&c" + Level.SEVERE + " Sword Info Grab Failure"));
+            e.printStackTrace();
             return;
         }
 
@@ -100,6 +102,14 @@ public class MobCoinSet {
         return sword;
     }
 
+    public boolean isEnabled() {
+        return setEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        setEnabled = enabled;
+    }
+
     public void giveSet() {
         if (setEnabled) {
             player.sendMessage(Utils.Chat("&cYou've already equipped your set."));
@@ -113,34 +123,22 @@ public class MobCoinSet {
             player.sendMessage(Utils.Chat("&cYou do not have enough spaces"));
             return;
         }
-        player.getInventory().addItem(helmet.getHelmet());
-        player.getInventory().addItem(chestplate.getChestplate());
-        player.getInventory().addItem(leggings.getLeggings());
-        player.getInventory().addItem(boots.getBoots());
+
+        getSword().refreshSword(player);
+
+        player.getInventory().setHelmet(helmet.getHelmet());
+        player.getInventory().setChestplate(chestplate.getChestplate());
+        player.getInventory().setLeggings(leggings.getLeggings());
+        player.getInventory().setBoots(boots.getBoots());
         player.getInventory().addItem(sword.getSword());
         setEnabled = true;
+        player.sendMessage(Utils.Chat("&aYou have been giving set MobCoin."));
     }
 
     public void removeSet() {
         if (!setEnabled) {
             player.sendMessage(Utils.Chat("&cYou do not have a set equipped."));
         }
-        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.DisplayName", getHelmet().getItemMeta().getDisplayName());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.DisplayName", getChestplate().getItemMeta().getDisplayName());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.DisplayName", getLeggings().getItemMeta().getDisplayName());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.DisplayName", getBoots().getItemMeta().getDisplayName());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.DisplayName", getSword().getItemMeta().getDisplayName());
-
-        data.set("MobCoinSet." + player.getUniqueId() + ".Helmet.Lore", getHelmet().getLore());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Chestplate.Lore", getChestplate().getLore());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Leggings.Lore", getLeggings().getLore());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Boots.Lore", getBoots().getLore());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.Lore", getSword().getLore());
-
-        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.Level", getSword().getLevel());
-        data.set("MobCoinSet." + player.getUniqueId() + ".Sword.XP", getSword().getXp());
-
-        data.reloadConfig();
 
         if (player.getInventory().getSize() == 0) return;
         for (ItemStack item : player.getInventory()) {
@@ -152,11 +150,17 @@ public class MobCoinSet {
                 player.getInventory().remove(item);
             }
         }
-        for (ItemStack item : player.getInventory().getArmorContents()) {
-            if (item == null) continue;
-            if (item.getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
-                player.getInventory().remove(item);
-            }
+        if (player.getInventory().getHelmet().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+            player.getInventory().setHelmet(null);
+        }
+        if (player.getInventory().getChestplate().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+            player.getInventory().setChestplate(null);
+        }
+        if (player.getInventory().getLeggings().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+            player.getInventory().setLeggings(null);
+        }
+        if (player.getInventory().getBoots().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+            player.getInventory().setBoots(null);
         }
         setEnabled = false;
     }

@@ -36,7 +36,6 @@ public class SetCommand implements CommandExecutor {
                     if (args[1].equalsIgnoreCase("mobcoin")) {
                         if (p.hasPermission("skillarmorsets.set.mobcoin")) {
                             plugin.mcSetStorage.get(p).giveSet();
-                            p.sendMessage(Utils.Chat("&aYou have been giving set MobCoin."));
                         }
                     }
                     break;

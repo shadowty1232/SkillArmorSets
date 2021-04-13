@@ -69,8 +69,11 @@ public class MobCoinSword {
         sql = plugin.sql;
         sMeta.setDisplayName(Utils.Chat("&eMobcoin Sword"));
 
+        sMeta.getPersistentDataContainer().set(swordKey, PersistentDataType.STRING, "mobcoinsword");
         sMeta.getPersistentDataContainer().set(levelKey, PersistentDataType.INTEGER, level);
         sMeta.getPersistentDataContainer().set(xpKey, PersistentDataType.INTEGER, xp);
+
+        lore = new ArrayList<>();
 
         int levelReq = (sMeta.getPersistentDataContainer().get(levelKey, PersistentDataType.INTEGER) * 100);
 

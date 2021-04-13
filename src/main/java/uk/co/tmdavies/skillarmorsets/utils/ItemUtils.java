@@ -36,6 +36,7 @@ public class ItemUtils {
         List<String> lore = iMeta.getLore();
         int levelReq = (container.get(levelKey, PersistentDataType.INTEGER) * 100);
 
+        lore.set(1, Utils.Chat("&7Level: &b" + container.get(levelKey, PersistentDataType.INTEGER)));
         lore.set(2, Utils.Chat("&7XP: &b" + container.get(xpKey, PersistentDataType.INTEGER) + "/" + container.get(levelKey, PersistentDataType.INTEGER) * 100));
         lore.set(3, getProgressBar(0, levelReq, container.get(xpKey, PersistentDataType.INTEGER)));
 
