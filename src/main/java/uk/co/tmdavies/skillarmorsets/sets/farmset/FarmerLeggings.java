@@ -1,4 +1,4 @@
-package uk.co.tmdavies.skillarmorsets.sets.mobcoinset;
+package uk.co.tmdavies.skillarmorsets.sets.farmset;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -7,26 +7,25 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import uk.co.tmdavies.skillarmorsets.SkillArmorSets;
-import uk.co.tmdavies.skillarmorsets.utils.ItemUtils;
 import uk.co.tmdavies.skillarmorsets.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MobCoinLeggings {
+public class FarmerLeggings {
 
     private ItemStack leggings;
     private ItemMeta lMeta;
     private List<String> lore;
-    private NamespacedKey mobcoinKey = new NamespacedKey(JavaPlugin.getPlugin(SkillArmorSets.class), "mobcoinset");
+    private NamespacedKey farmerKey = new NamespacedKey(JavaPlugin.getPlugin(SkillArmorSets.class), "farmerset");
 
-    public MobCoinLeggings() {
-        leggings = new ItemStack(Material.GOLDEN_LEGGINGS, 1);
+    public FarmerLeggings() {
+        leggings = new ItemStack(Material.CHAINMAIL_LEGGINGS, 1);
         lMeta = leggings.getItemMeta();
 
-        lMeta.setDisplayName(Utils.Chat("&eMobcoin Leggings"));
+        lMeta.setDisplayName(Utils.Chat("&eFarmer Leggings"));
 
-        lMeta.getPersistentDataContainer().set(mobcoinKey, PersistentDataType.STRING, "mobcoinset");
+        lMeta.getPersistentDataContainer().set(farmerKey, PersistentDataType.STRING, "farmerset");
 
         leggings.setItemMeta(lMeta);
 
@@ -35,7 +34,7 @@ public class MobCoinLeggings {
         lore.add("");
         lore.add(Utils.Chat("&bFULL SET ABILITY"));
         lore.add(Utils.Chat("&7Wearing this set will allow you to gain"));
-        lore.add(Utils.Chat("&7more mobcoins."));
+        lore.add(Utils.Chat("&7more crops while farming."));
 
         lMeta.setLore(lore);
         lMeta.setUnbreakable(true);

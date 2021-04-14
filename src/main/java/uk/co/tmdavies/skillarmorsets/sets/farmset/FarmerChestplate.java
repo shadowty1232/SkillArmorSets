@@ -1,4 +1,4 @@
-package uk.co.tmdavies.skillarmorsets.sets.mobcoinset;
+package uk.co.tmdavies.skillarmorsets.sets.farmset;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,20 +12,20 @@ import uk.co.tmdavies.skillarmorsets.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MobCoinChestplate {
+public class FarmerChestplate {
 
     private ItemStack chestplate;
     private ItemMeta cMeta;
     private List<String> lore;
-    private NamespacedKey mobcoinKey = new NamespacedKey(JavaPlugin.getPlugin(SkillArmorSets.class), "mobcoinset");
+    private NamespacedKey farmerKey = new NamespacedKey(JavaPlugin.getPlugin(SkillArmorSets.class), "farmerset");
 
-    public MobCoinChestplate() {
-        chestplate = new ItemStack(Material.GOLDEN_CHESTPLATE, 1);
+    public FarmerChestplate() {
+        chestplate = new ItemStack(Material.CHAINMAIL_CHESTPLATE, 1);
         cMeta = chestplate.getItemMeta();
 
-        cMeta.setDisplayName(Utils.Chat("&eMobcoin Chestplate"));
+        cMeta.setDisplayName(Utils.Chat("&eFarmer Chestplate"));
 
-        cMeta.getPersistentDataContainer().set(mobcoinKey, PersistentDataType.STRING, "mobcoinset");
+        cMeta.getPersistentDataContainer().set(farmerKey, PersistentDataType.STRING, "farmerset");
 
         chestplate.setItemMeta(cMeta);
 
@@ -34,7 +34,7 @@ public class MobCoinChestplate {
         lore.add("");
         lore.add(Utils.Chat("&bFULL SET ABILITY"));
         lore.add(Utils.Chat("&7Wearing this set will allow you to gain"));
-        lore.add(Utils.Chat("&7more mobcoins."));
+        lore.add(Utils.Chat("&7more crops while farming."));
 
         cMeta.setLore(lore);
         cMeta.setUnbreakable(true);

@@ -6,9 +6,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import uk.co.tmdavies.skillarmorsets.SkillArmorSets;
+import uk.co.tmdavies.skillarmorsets.sets.farmset.*;
 import uk.co.tmdavies.skillarmorsets.sets.mobcoinset.*;
 import uk.co.tmdavies.skillarmorsets.sql.MySQL;
-import uk.co.tmdavies.skillarmorsets.utils.Config;
 import uk.co.tmdavies.skillarmorsets.utils.Utils;
 
 import java.sql.PreparedStatement;
@@ -16,65 +16,63 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
-public class MobCoinSet {
+public class FarmerSet {
 
     private Player player;
-    private MobCoinHelmet helmet;
-    private MobCoinChestplate chestplate;
-    private MobCoinLeggings leggings;
-    private MobCoinBoots boots;
-    private MobCoinSword sword;
+    private FarmerHelmet helmet;
+    private FarmerChestplate chestplate;
+    private FarmerLeggings leggings;
+    private FarmerBoots boots;
+    private FarmerHoe hoe;
     private SkillArmorSets plugin = JavaPlugin.getPlugin(SkillArmorSets.class);
-    private NamespacedKey mobcoinKey = new NamespacedKey(plugin, "mobcoinset");
-    private NamespacedKey swordKey = new NamespacedKey(plugin, "sword");
+    private NamespacedKey farmerKey = new NamespacedKey(plugin, "farmerset");
+    private NamespacedKey hoeKey = new NamespacedKey(plugin, "hoe");
     private MySQL sql = plugin.sql;
     private boolean setEnabled = false;
 
 
-    public MobCoinSet(Player player) {
+    public FarmerSet(Player player) {
         this.player = player;
-        helmet = new MobCoinHelmet();
-        chestplate = new MobCoinChestplate();
-        leggings = new MobCoinLeggings();
-        boots = new MobCoinBoots();
-        sword = new MobCoinSword();
-
-        giveSet();
+        helmet = new FarmerHelmet();
+        chestplate = new FarmerChestplate();
+        leggings = new FarmerLeggings();
+        boots = new FarmerBoots();
+        hoe = new FarmerHoe();
 
         player.sendMessage(Utils.Chat("&aYou have been giving set MobCoin."));
     }
 
-    public MobCoinSet(Player player, boolean hasJoined) {
+    public FarmerSet(Player player, boolean hasJoined) {
 
         if (!hasJoined) {
-            new MobCoinSet(player);
+            new FarmerSet(player);
             return;
         }
 
         this.player = player;
-        int swordLevel;
-        int swordXp;
+        int hoeLevel;
+        int hoeXp;
 
-        String query = "SELECT * FROM `" + sql.getDatabase() + "`.`MobCoinSword` WHERE `UUID` = ?";
+        String query = "SELECT * FROM `" + sql.getDatabase() + "`.`FarmerHoe` WHERE `uuid` = ?";
         try {
             PreparedStatement grabState = sql.getConnection().prepareStatement(query);
             grabState.setString(1, player.getUniqueId().toString());
             ResultSet set = grabState.executeQuery();
             plugin.getLogger().info(String.valueOf(MySQL.rowCount(set)));
-            swordLevel = set.getInt("level");
-            swordXp = set.getInt("xp");
+            hoeLevel = set.getInt("level");
+            hoeXp = set.getInt("xp");
         } catch (SQLException e) {
-            plugin.getLogger().info(Level.SEVERE + " Sword Info Grab Failure");
-            player.sendMessage(Utils.Chat("&c" + Level.SEVERE + " Sword Info Grab Failure"));
+            plugin.getLogger().info(Level.SEVERE + " Hoe Info Grab Failure");
+            player.sendMessage(Utils.Chat("&c" + Level.SEVERE + " Hoe Info Grab Failure"));
             e.printStackTrace();
             return;
         }
 
-        helmet = new MobCoinHelmet();
-        chestplate = new MobCoinChestplate();
-        leggings = new MobCoinLeggings();
-        boots = new MobCoinBoots();
-        sword = new MobCoinSword(swordLevel, swordXp);
+        helmet = new FarmerHelmet();
+        chestplate = new FarmerChestplate();
+        leggings = new FarmerLeggings();
+        boots = new FarmerBoots();
+        hoe = new FarmerHoe(hoeLevel, hoeXp);
 
     }
 
@@ -82,24 +80,24 @@ public class MobCoinSet {
         return player;
     }
 
-    public MobCoinHelmet getHelmet() {
+    public FarmerHelmet getHelmet() {
         return helmet;
     }
 
-    public MobCoinChestplate getChestplate() {
+    public FarmerChestplate getChestplate() {
         return chestplate;
     }
 
-    public MobCoinLeggings getLeggings() {
+    public FarmerLeggings getLeggings() {
         return leggings;
     }
 
-    public MobCoinBoots getBoots() {
+    public FarmerBoots getBoots() {
         return boots;
     }
 
-    public MobCoinSword getSword() {
-        return sword;
+    public FarmerHoe getHoe() {
+        return hoe;
     }
 
     public boolean isEnabled() {
@@ -124,17 +122,17 @@ public class MobCoinSet {
             return;
         }
 
-        getSword().refreshSword(player);
+        getHoe().refreshHoe(player);
 
         player.getInventory().setHelmet(helmet.getHelmet());
         player.getInventory().setChestplate(chestplate.getChestplate());
         player.getInventory().setLeggings(leggings.getLeggings());
         player.getInventory().setBoots(boots.getBoots());
-        player.getInventory().addItem(sword.getSword());
+        player.getInventory().addItem(hoe.getHoe());
 
         setEnabled = true;
 
-        player.sendMessage(Utils.Chat(plugin.lang.getString("MobCoins.Equipped")
+        player.sendMessage(Utils.Chat(plugin.lang.getString("Farmer.Equipped")
                 .replace("%prefix%", Utils.Chat(plugin.lang.getString("Prefix")))));
     }
 
@@ -146,28 +144,28 @@ public class MobCoinSet {
         if (player.getInventory().getSize() == 0) return;
         for (ItemStack item : player.getInventory()) {
             if (item == null) continue;
-            if (item.getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+            if (item.getItemMeta().getPersistentDataContainer().has(farmerKey, PersistentDataType.STRING)) {
                 player.getInventory().remove(item);
             }
-            if (item.getItemMeta().getPersistentDataContainer().has(swordKey, PersistentDataType.STRING)) {
+            if (item.getItemMeta().getPersistentDataContainer().has(hoeKey, PersistentDataType.STRING)) {
                 player.getInventory().remove(item);
             }
         }
-        if (player.getInventory().getHelmet().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+        if (player.getInventory().getHelmet().getItemMeta().getPersistentDataContainer().has(farmerKey, PersistentDataType.STRING)) {
             player.getInventory().setHelmet(null);
         }
-        if (player.getInventory().getChestplate().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+        if (player.getInventory().getChestplate().getItemMeta().getPersistentDataContainer().has(farmerKey, PersistentDataType.STRING)) {
             player.getInventory().setChestplate(null);
         }
-        if (player.getInventory().getLeggings().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+        if (player.getInventory().getLeggings().getItemMeta().getPersistentDataContainer().has(farmerKey, PersistentDataType.STRING)) {
             player.getInventory().setLeggings(null);
         }
-        if (player.getInventory().getBoots().getItemMeta().getPersistentDataContainer().has(mobcoinKey, PersistentDataType.STRING)) {
+        if (player.getInventory().getBoots().getItemMeta().getPersistentDataContainer().has(farmerKey, PersistentDataType.STRING)) {
             player.getInventory().setBoots(null);
         }
         setEnabled = false;
 
-        player.sendMessage(Utils.Chat(plugin.lang.getString("MobCoins.Unequipped")
+        player.sendMessage(Utils.Chat(plugin.lang.getString("Farmer.Unequipped")
                 .replace("%prefix%", Utils.Chat(plugin.lang.getString("Prefix")))));
     }
 

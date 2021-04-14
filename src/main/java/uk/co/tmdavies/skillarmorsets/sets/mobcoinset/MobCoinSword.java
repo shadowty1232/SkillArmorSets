@@ -153,7 +153,7 @@ public class MobCoinSword {
     }
 
     public void saveSQL(Player p) throws SQLException {
-        String query = "UPDATE `" + sql.getDatabase() + "`.`MobCoinSword` SET `LEVEL` = ?, `XP` = ? WHERE `UUID` = ?";
+        String query = "UPDATE `" + sql.getDatabase() + "`.`MobCoinSword` SET `level` = ?, `xp` = ? WHERE `UUID` = ?";
         try (PreparedStatement statement = sql.getConnection().prepareStatement(query)) {
             statement.setInt(1, getLevel());
             statement.setInt(2, getXp());
@@ -164,14 +164,14 @@ public class MobCoinSword {
     }
 
     public void fillSwordTable(Player p) {
-        String check = "SELECT * FROM `" + sql.getDatabase() + "`.`MobCoinSword` WHERE `UUID` = ? LIMIT 1";
+        String check = "SELECT * FROM `" + sql.getDatabase() + "`.`MobCoinSword` WHERE `uuid` = ? LIMIT 1";
         try (PreparedStatement checkState = sql.getConnection().prepareStatement(check)) {
             checkState.setString(1, p.getUniqueId().toString());
 
             ResultSet set = checkState.executeQuery();
 
             if (MySQL.rowCount(set) == 0) {
-                String insert = "INSERT INTO `" + sql.getDatabase() + "`.`MobCoinSword` (ID, UUID, LEVEL, XP) VALUE (NULL, ?, ?, ?)";
+                String insert = "INSERT INTO `" + sql.getDatabase() + "`.`MobCoinSword` (id, uuid, level, xp) VALUE (NULL, ?, ?, ?)";
 
                 try (PreparedStatement insertState = sql.getConnection().prepareStatement(insert)) {
                     insertState.setString(1, p.getUniqueId().toString());

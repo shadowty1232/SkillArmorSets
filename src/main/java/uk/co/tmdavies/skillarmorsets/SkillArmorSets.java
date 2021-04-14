@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import uk.co.tmdavies.skillarmorsets.enums.Commands;
 import uk.co.tmdavies.skillarmorsets.enums.Listeners;
 import uk.co.tmdavies.skillarmorsets.runnables.MobCoinChecker;
+import uk.co.tmdavies.skillarmorsets.sets.FarmerSet;
 import uk.co.tmdavies.skillarmorsets.sets.MobCoinSet;
 import uk.co.tmdavies.skillarmorsets.sql.MobCoins;
 import uk.co.tmdavies.skillarmorsets.sql.MySQL;
@@ -17,6 +18,8 @@ import java.util.HashMap;
 public final class SkillArmorSets extends JavaPlugin {
 
     public HashMap<Player, MobCoinSet> mcSetStorage;
+    public HashMap<Player, FarmerSet> farmerSetStorage;
+
     public HashMap<Player, Integer> coinBuffer;
 
     public Config lang;
@@ -25,7 +28,7 @@ public final class SkillArmorSets extends JavaPlugin {
 
     public MobCoins mobCoins;
 
-    private double langVersion = 1.0;
+    private double langVersion = 1.1;
     // Mob Coin Set
     // PvP Set
     // Farm Set (Sugar Coin)
@@ -33,12 +36,13 @@ public final class SkillArmorSets extends JavaPlugin {
     @Override
     public void onEnable() {
         this.mcSetStorage = new HashMap<>();
+        this.farmerSetStorage = new HashMap<>();
         this.coinBuffer = new HashMap<>();
         this.sql = SQLUtils.setUpSQL();
         this.mobCoins = new MobCoins(this);
         this.data = new Config(this, "./plugins/SkillArmorSets/data.yml");
         this.lang = new Config(this, "./plugins/SkillArmorSets/lang.yml");
-        SQLUtils.createSwordTable();
+        SQLUtils.setUpTables();
 
         setUpLang();
         registerCommands();
@@ -70,8 +74,14 @@ public final class SkillArmorSets extends JavaPlugin {
     public void setUpLang() {
         if (lang.getDouble("Version") != langVersion) {
             lang.set("Version", langVersion);
-            lang.set("Prefix", "&8[&bMobCoins&8]");
+            lang.set("Prefix", "&8[&bSkillArmorSets&8]");
+
             lang.set("MobCoins.Get", "%prefix% &7You have gained &a%amount% &7Mobcoins.");
+            lang.set("MobCoins.Equipped", "%prefix% &aYou have equipped the MobCoins Set");
+            lang.set("MobCoins.Unequipped", "%prefix% &aYou have unequipped the MobCoins Set");
+
+            lang.set("Farmer.Equipped", "%prefix% &aYou have equipped the Farmer Set");
+            lang.set("Farmer.Unequipped", "%prefix% &aYou have unequipped the Farmer Set");
         }
     }
 }

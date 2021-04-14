@@ -43,17 +43,37 @@ public class SQLUtils {
         return sql;
     }
 
+    public static void setUpTables() {
+        createSwordTable();
+        createHoeTable();
+    }
+
     public static void createSwordTable() {
         String query = "CREATE TABLE IF NOT EXISTS `" + sql.getDatabase() + "`.`MobCoinSword` (" +
-                "`ID` INT(11) NOT NULL AUTO_INCREMENT, " +
-                "`UUID` VARCHAR(36) NOT NULL, " +
-                "`LEVEL` INT(11) NOT NULL, " +
-                "`XP` INT(11) NOT NULL, " +
-                "PRIMARY KEY (`ID`)) ENGINE = InnoDB;";
+                "`id` INT(11) NOT NULL AUTO_INCREMENT, " +
+                "`uuid` VARCHAR(36) NOT NULL, " +
+                "`level` INT(11) NOT NULL, " +
+                "`xp` INT(11) NOT NULL, " +
+                "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
         try (PreparedStatement state = sql.getConnection().prepareStatement(query)) {
             state.execute();
         } catch (SQLException e) {
-            JavaPlugin.getPlugin(SkillArmorSets.class).getLogger().info(Level.SEVERE + " SQL Fail");
+            JavaPlugin.getPlugin(SkillArmorSets.class).getLogger().info(Level.SEVERE + " SQL Fail MobCoinSword");
+            e.printStackTrace();
+        }
+    }
+
+    public static void createHoeTable() {
+        String query = "CREATE TABLE IF NOT EXISTS `" + sql.getDatabase() + "`.`FarmerHoe` (" +
+                "`id` INT(11) NOT NULL AUTO_INCREMENT, " +
+                "`uuid` VARCHAR(36) NOT NULL, " +
+                "`level` INT(11) NOT NULL, " +
+                "`xp` INT(11) NOT NULL, " +
+                "PRIMARY KEY (`id`)) ENGINE = InnoDB;";
+        try (PreparedStatement state = sql.getConnection().prepareStatement(query)) {
+            state.execute();
+        } catch (SQLException e) {
+            JavaPlugin.getPlugin(SkillArmorSets.class).getLogger().info(Level.SEVERE + " SQL Fail FarmerHoe");
             e.printStackTrace();
         }
     }

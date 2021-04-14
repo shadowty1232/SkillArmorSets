@@ -5,6 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import uk.co.tmdavies.skillarmorsets.SkillArmorSets;
+import uk.co.tmdavies.skillarmorsets.sets.FarmerSet;
 import uk.co.tmdavies.skillarmorsets.sets.MobCoinSet;
 import uk.co.tmdavies.skillarmorsets.utils.Utils;
 
@@ -38,13 +39,21 @@ public class SetCommand implements CommandExecutor {
                             plugin.mcSetStorage.get(p).giveSet();
                         }
                     }
+                    if (args[1].equalsIgnoreCase("farmer")) {
+                        if (p.hasPermission("skillarmorsets.set.farmer")) {
+                            plugin.farmerSetStorage.get(p).giveSet();
+                        }
+                    }
                     break;
                 case "remove":
                     if (args[1].equalsIgnoreCase("mobcoin")) {
                         if (p.hasPermission("skillarmorsets.set.mobcoin")) {
-                            MobCoinSet mobCoinSet = plugin.mcSetStorage.get(p);
-                            mobCoinSet.removeSet();
-                            p.sendMessage(Utils.Chat("&cYou have taken away set MobCoin."));
+                            plugin.mcSetStorage.get(p).removeSet();
+                        }
+                    }
+                    if (args[1].equalsIgnoreCase("farmer")) {
+                        if (p.hasPermission("skillarmorsets.set.farmer")) {
+                            plugin.farmerSetStorage.get(p).removeSet();
                         }
                     }
                     break;
